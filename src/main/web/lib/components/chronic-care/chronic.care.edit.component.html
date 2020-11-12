@@ -1,0 +1,826 @@
+<div class="lamis-edit-form">
+    <div class="lamis-edit-form-container">
+        <form name="form" role="form" novalidate (ngSubmit)="save()" #careForm="ngForm">
+            <mat-card class="default">
+                <mat-card-content>
+                    <mat-vertical-stepper #stepper *ngIf="entity.patient">
+                        <mat-step>
+                            <ng-template matStepLabel>Details</ng-template>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <input matInput [matDatepicker]="picker"
+                                               placeholder="Date of Visit"
+                                               [(ngModel)]="entity.dateVisit"
+                                               #visit="ngModel"
+                                               [matDatepickerFilter]="filterDates.bind(this)"
+                                               [max]="today"
+                                               [min]="entity.patient.dateRegistration"
+                                               name="visit"
+                                               required>
+                                        <mat-datepicker-toggle
+                                                matSuffix
+                                                [for]="picker">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker></mat-datepicker>
+                                        <mat-error
+                                                *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.required)">
+                                            Date of Visit is required
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
+                                            Date of Visit cannot be before {{entity.patient.dateRegistration}}
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
+                                            Date of Visit cannot be in the future
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">Type of Client:</mat-label>
+                                        <mat-select name="clinicType" [(ngModel)]="entity.clientType" name="type">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'PLHIV newly enrolled into HIV Care & treatment'">PLHIV
+                                                newly enrolled into HIV Care & treatment
+                                            </mat-option>
+                                            <mat-option [value]="'Registered PLHIV on first time visit this FY'">
+                                                Registered PLHIV on first time visit this FY
+                                            </mat-option>
+                                            <mat-option
+                                                    [value]="'Registered PLHIV on follow up/subsequent visit this FY'">
+                                                Registered PLHIV on follow up/subsequent visit this FY
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">ART Status</mat-label>
+                                        <mat-select name="currentStatus" [(ngModel)]="entity.currentStatus"
+                                                    name="status">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'Pre-ART'">Pre-ART</mat-option>
+                                            <mat-option [value]="'ART'">ART</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" *ngIf="entity.patient.gender === 'Female'">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">Pregnancy Status:</mat-label>
+                                        <mat-select name="pregnancyStatus" [(ngModel)]="entity.pregnancyStatus"
+                                                    name="preg">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'Pregnant'">Pregnant</mat-option>
+                                            <mat-option [value]="'Non-Pregnant'">Non-Pregnant</mat-option>
+                                            <mat-option [value]="'Post Partum'">Post Partum</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">Clinical Stage:</mat-label>
+                                        <mat-select name="clinicStage" [(ngModel)]="entity.clinicStage" name="stage">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'Stage I'">Stage I</mat-option>
+                                            <mat-option [value]="'Stage II'">Stage II</mat-option>
+                                            <mat-option [value]="'Stage III'">Stage III</mat-option>
+                                            <mat-option [value]="'Stage IV'">Stage IV</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">Last CD4 Count:</mat-label>
+                                        <input matInput type="number" name="lastCd4"
+                                               #lastCd4="ngModel"
+                                               [(ngModel)]="entity.lastCd4"
+                                               [required]="!!entity.dateLastCd4"
+                                               [min]="1"/>
+                                        <mat-error
+                                                *ngIf="lastCd4.errors && (lastCd4.dirty || lastCd4.touched) && (lastCd4.errors.min)">
+                                            Minimum value is 1
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <input matInput [matDatepicker]="picker1"
+                                               placeholder="Date of Last CD4"
+                                               [(ngModel)]="entity.dateLastCd4"
+                                               [required]="!!entity.lastCd4"
+                                               #cd4="ngModel"
+                                               name="cd4"
+                                               [max]="today"
+                                               [min]="entity.patient.dateRegistration">
+                                        <mat-datepicker-toggle
+                                                matSuffix
+                                                [for]="picker1">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker1></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label class="form-label">Last Viral Load Count:</mat-label>
+                                        <input matInput type="number" name="lastViral"
+                                               #lastViral="ngModel"
+                                               [(ngModel)]="entity.lastViralLoad"
+                                               [required]="!!entity.dateLastViralLoad"
+                                               [min]="1"/>
+                                        <mat-error
+                                                *ngIf="lastViral.errors && (lastViral.dirty || lastViral.touched) && (lastViral.errors.min)">
+                                            Minimum value is 1
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <input matInput [matDatepicker]="picker2"
+                                               placeholder="Date of Last Viral Load"
+                                               [(ngModel)]="entity.dateLastViralLoad"
+                                               [required]="!!entity.lastViralLoad"
+                                               #viral="ngModel"
+                                               name="viral"
+                                               [max]="today"
+                                               [min]="entity.patient.dateRegistration">
+                                        <mat-datepicker-toggle
+                                                matSuffix
+                                                [for]="picker2">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker2></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.eligibleCd4" name="cd">
+                                        Eligible for CD4
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.eligibleViralLoad"
+                                                  name="vr">
+                                        Eligible for Viral Load
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Co-trimoxazole Eligibility Assessment</ng-template>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.plhivSymtomaticHiv"
+                                                          name="symt"
+                                            >
+                                                PLHIV with symptomatic HIV
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.plhivAsymtomaticCD4L500"
+                                                          name="sdym"
+                                            >
+                                                Asymptomatic PLHIV with CD4 count &lt;500 cells/mm<sup>3</sup>
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.plhivActiveTb"
+                                                          name="activeTb"
+                                            >
+                                                PLHIV with active TB
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.plhivPregnantAfter1stTrimester"
+                                                          name="ftm"
+                                            >
+                                                Pregnant PLHIV after the first trimester
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.plhivL5Years"
+                                                          name="l5"
+                                            >
+                                                LHIV &le; 5 years
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>TB Screening</ng-template>
+                            <div class="row ">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.tbTreatment"
+                                                  name="tbTreatment">
+                                        Are you currently on TB Treatment?
+                                    </mat-checkbox>
+                                    <div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <input matInput [matDatepicker]="picker3"
+                                               placeholder="Date Started"
+                                               [(ngModel)]="entity.dateStartedTbTreatment"
+                                               [required]="entity.tbTreatment"
+                                               #started="ngModel"
+                                               name="started"
+                                               [max]="today"
+                                               [min]="entity.patient.dateRegistration">
+                                        <mat-datepicker-toggle
+                                                matSuffix
+                                                [for]="picker3">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker3></mat-datepicker>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row ">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.tbReferred"
+                                                          name="tbReferred">
+                                                Referred for TB Diagnosis
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.ipt"
+                                                          name="ipt"
+                                            >
+                                                Are you currently on Isoniazid Preventive Therapy (IPT)?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.inh"
+                                                          name="inh"
+                                            >
+                                                Have you received INH within the past 2 year?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.eligibleIpt"
+                                                          name="iptEl"
+                                            >
+                                                Eligible for IPT
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Nutritional Assessment</ng-template>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <mat-form-field class="full-width">
+                                        <input matInput placeholder="Body weight(Kg)" [min]="1" [max]="250"
+                                               type="number"
+                                               (change)="calculateBmi()"
+                                               #weight="ngModel" name="weight" [(ngModel)]="entity.bodyWeight"/>
+                                        <mat-error
+                                                *ngIf="weight.errors && (weight.dirty || weight.touched) && (weight.errors.min)">
+                                            Minimum body weight is 1
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="weight.errors && (weight.dirty || weight.touched) && (weight.errors.max)">
+                                            Maximum body weight is 250
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="full-width">
+                                        <input matInput placeholder="Height (m)" [min]="0.2" [max]="1.8" type="number"
+                                               #height="ngModel" name="height" [(ngModel)]="entity.height"
+                                               (change)="calculateBmi()"/>
+                                        <mat-error
+                                                *ngIf="height.errors && (height.dirty || height.touched) && (height.errors.min)">
+                                            Minimum height is 0.2
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="height.errors && (height.dirty || height.touched) && (height.errors.max)">
+                                            Maximum height is 1.8m
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>BMI Calculated</mat-label>
+                                        <input matInput disabled [value]="bmiCalculated">
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-3">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>BMI Range</mat-label>
+                                        <input matInput disabled [value]="bmi">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <mat-form-field class="full-width">
+                                        <mat-label> MUAC (cm) (under 5yrs):</mat-label>
+                                        <input matInput [min]="2" [max]="26.5"
+                                               type="number"
+                                               #muac="ngModel" name="muac" [(ngModel)]="entity.muac"/>
+                                        <mat-error
+                                                *ngIf="muac.errors && (muac.dirty || muac.touched) && (muac.errors.min)">
+                                            Minimum Mid Upper Arm Circumference is 2
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="muac.errors && (muac.dirty || muac.touched) && (muac.errors.max)">
+                                            Maximum Mid Upper Arm Circumference is 26.5
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>UAC Pediatrics</mat-label>
+                                        <mat-select name="muacPediatrics"
+                                                    [(ngModel)]="entity.muacPediatrics">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'<11.5cm (Severe Acute Malnutrition)'">&lt;11.5cm
+                                                (Severe Acute Malnutrition)
+                                            </mat-option>
+                                            <mat-option [value]="'11.5-12.5cm (Moderate Acute Malnutrition)'">
+                                                11.5-12.5cm (Moderate Acute Malnutrition)
+                                            </mat-option>
+                                            <mat-option [value]="'>12.5cm (Well nourished)'">&gt;12.5cm (Well
+                                                nourished)
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-4" *ngIf="entity.patient.gender === 'Female'">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>MUAC Pregnant:</mat-label>
+                                        <mat-select name="muacPregnant" [(ngModel)]="entity.muacPregnant">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'<23cm (Underweight)'">&lt;23cm (Underweight)
+                                            </mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.supplementaryFood"
+                                                          name="supp"
+                                            >
+                                                Provided with Therapeutic/Supplementary
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.nutritionalStatusReferred"
+                                                          name="nutr"
+                                            >
+                                                Referred
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Gender Based Violence Screening</ng-template>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.sexuallyAbused"
+                                                          name="sexuallyAbused"
+                                            >
+                                                Have you been beaten, sexually coerced, raped or threatened or any of
+                                                these by your partner or anyone else?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.sexuallyAbusedReferred"
+                                                          *ngIf="entity.sexuallyAbused"
+                                                          name="sexuallyAbusedReferred"
+                                            >
+                                                Referred for Post GBV Care
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.essentialsDeniedByPartner"
+                                                          name="denied"
+                                            >
+                                                Does your partner/family deny you food, shelter, freedom of movement,
+                                                livelihood or finance to access health care?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.essentialsDeniedByPartnerReferred"
+                                                          *ngIf="entity.essentialsDeniedByPartner"
+                                                          name="deniedReferred"
+                                            >
+                                                Referred for Post GBV Care
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Screening for Chronic Conditions</ng-template>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.hypertensive"
+                                                  name="hyper"
+                                    >
+                                        Known Hypertensive?
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.firstHypertensive"
+                                                  *ngIf="entity.hypertensive"
+                                                  name="hyper1s"
+                                    >
+                                        First time identified within the programme
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.bpAbove14090"
+                                                  name="bpAbove"
+                                    >
+                                        BP above 140/90mmHg
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.bpReferred"
+                                                  *ngIf="entity.bpAbove14090"
+                                                  name="bpReferred"
+                                    >
+                                        Referred for further care
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.diabetic"
+                                                  name="diabetic"
+                                    >
+                                        Known Diabetic?
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.firstDiabetic"
+                                                  *ngIf="entity.diabetic"
+                                                  name="diabetic1st"
+                                    >
+                                        First Time Identified Within the Programme?
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.dmReferred"
+                                                  name="dm"
+                                    >
+                                        Referred for further care
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Positive Health Dignity and Prevention(PHDP)</ng-template>
+                            <h5>A)Prevent HIV Transmission</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>How many doses of ARVs have you missed since the last appointment?(If
+                                            on ART)
+                                        </mat-label>
+                                        <mat-select name="missed1" [(ngModel)]="entity.missedArvs">
+                                            <mat-option></mat-option>
+                                            <mat-option [value]="'<=3'">&le;3</mat-option>
+                                            <mat-option [value]="'4-8'">4-8</mat-option>
+                                            <mat-option [value]="'>=9'">&ge;9</mat-option>
+                                        </mat-select>
+                                    </mat-form-field>
+                                </div>
+                                <mat-list>
+                                    <mat-list-item>
+                                        <mat-checkbox [(ngModel)]="entity.missedArvsServicesProvided"
+                                                      name="missed1Referred"
+                                        >
+                                            Medication adherence counselling done?
+                                        </mat-checkbox>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <mat-checkbox [(ngModel)]="entity.statusDisclosedToPartner"
+                                                      name="sdtp"
+                                        >
+                                            Have you disclosed your status to your partner(s)?
+                                        </mat-checkbox>
+                                    </mat-list-item>
+                                    >
+                                    <mat-list-item>
+                                        <mat-checkbox [(ngModel)]="entity.partnerStatusKnown"
+                                                      name="psk"
+                                        >
+                                            Do you know the status of your partner(s)?
+                                        </mat-checkbox>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <mat-checkbox [(ngModel)]="entity.useCondomsAlways"
+                                                      name="uca"
+                                        >
+                                            Do you use condoms during every sexual encounter?
+                                        </mat-checkbox>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <mat-checkbox [(ngModel)]="entity.useCondomsAlwaysServicesProvided"
+                                                      name="ucasp"
+                                        >
+                                            Condom use counselling done?
+                                        </mat-checkbox>
+                                    </mat-list-item>
+                                </mat-list>
+                            </div>
+                            <mat-divider class="pb-1"></mat-divider>
+                            <h5>B)Prevent Diseases/Opportunistic Infections</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="entity.opportunisticInfections"
+                                                  name="oi"
+                                    >
+                                        Do you/partner have genital sores/rash/pain/discharge/bleeding?
+                                    </mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>How many doses of Co-trimoxazole have you missed since the last
+                                            appointment?
+                                        </mat-label>
+                                        <input matInput type="number" [(ngModel)]="entity.missedCotrim" [min]="1"
+                                               #missed="ngModel"
+                                               name="missed"/>
+                                        <mat-error
+                                                *ngIf="missed.errors && (missed.dirty || missed.touched) && (missed.errors.min)">
+                                            Minimum value is 1
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <mat-divider class="pb-1"></mat-divider>
+                            <h5>C)Promote Healthy Living</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width">
+                                        <mat-label>How regularly do you take alcohol in a week?</mat-label>
+                                        <input matInput type="number" [(ngModel)]="entity.weeklyAlcoholConsumption"
+                                               [min]="1" #alcohol="ngModel"
+                                               name="alcohol"/>
+                                        <mat-error
+                                                *ngIf="alcohol.errors && (alcohol.dirty || alcohol.touched) && (alcohol.errors.min)">
+                                            Minimum value is 1
+                                        </mat-error>
+                                    </mat-form-field>
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.weeklyAlcoholConsumptionServicesProvided"
+                                                          name="alcolR"
+                                            >
+                                                Nutritional counseling done?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.washServicesProvided"
+                                                          name="wash"
+                                            >
+                                                WASH counseling done?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <mat-divider class="pb-1"></mat-divider>
+                            <h5>Additional PHDP Services provided</h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.useInsecticideNets"
+                                                          name="uin"
+                                            >
+                                                Insecticide treated nets
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.cervicalCancerScreening"
+                                                          name="ccs"
+                                            >
+                                                Cervical Cancer Screening
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.activeMemberOfSG"
+                                                          name="amsg"
+                                            >
+                                                Active member of SG
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.familyPlanning"
+                                                          name="fp"
+                                            >
+                                                Family Planning
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.basicCareKits"
+                                                          name="bck"
+                                            >
+                                                Basic care kits
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.disclosureCounseling"
+                                                          name="dc"
+                                            >
+                                                Disclosure counseling
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.socialServices"
+                                                          name="sc"
+                                            >
+                                                Social Services
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.linkageToIGA"
+                                                          name="liga"
+                                            >
+                                                Linkage to IGAs
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.legalServices"
+                                                          name="ls"
+                                            >
+                                                Legal Services
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.otherServices"
+                                                          name="ots"
+                                            >
+                                                Others
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                                <button mat-button type="button" matStepperNext>Next</button>
+                            </div>
+                        </mat-step>
+                        <mat-step>
+                            <ng-template matStepLabel>Reproductive Intentions</ng-template>
+                            <div class="row ">
+                                <div class="col-md-6">
+                                    <mat-list>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.cervicalCancerScreeningWithinPastYear"
+                                                          name="ccswpy"
+                                            >
+                                                Have you been screened for cervical cancer in the last one year?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox
+                                                    [(ngModel)]="entity.cervicalCancerScreeningWithinPastYearReferred"
+                                                    name="ccswpyr"
+                                            >
+                                                Referred for further care
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.wantPregnancyWithinAYear"
+                                                          name="wpwy"
+                                            >
+                                                Do you want a pregnancy in the next one year?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.wantPregnancyWithinAYearReferred"
+                                                          name="wpwar"
+                                            >
+                                                Referred for further care?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.currentlyUsingContraceptive"
+                                                          name="cuc"
+                                            >
+                                                If no, are you currently using a contraceptive?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.currentlyUsingContraceptiveReferred"
+                                                          name="cucr"
+                                            >
+                                                Referred for further care?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                    <mat-divider class="pb-1"></mat-divider>
+                                    <h5>Malaria Prevention</h5>
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.useInsecticideBedNet"
+                                                          name="uibn"
+                                            >
+                                                Do you use insecticide treated bed net?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <mat-checkbox [(ngModel)]="entity.useInsecticideBedNetReferred"
+                                                          name="uibnr"
+                                            >
+                                                Referred?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox [(ngModel)]="entity.pregnantIntermittentPreventiveTherapy"
+                                                          name="pipt"
+                                            >
+                                                If pregnant: have you been on intermittent preventive therapy?
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item *ngIf="entity.patient.gender === 'Female'">
+                                            <mat-checkbox
+                                                    [(ngModel)]="entity.pregnantIntermittentPreventiveTherapyReferred"
+                                                    name="piptr"
+                                            >
+                                                Referred
+                                            </mat-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </div>
+                            </div>
+                            <div>
+                                <button mat-button type="button" matStepperPrevious>Back</button>
+                            </div>
+                        </mat-step>
+                    </mat-vertical-stepper>
+                    <mat-divider></mat-divider>
+                </mat-card-content>
+                <mat-card-actions class="lamis-edit-form-actions">
+                    <button mat-raised-button type="button" (click)="previousState()">Back</button>
+                    <button mat-raised-button color='primary'
+                            [disabled]="careForm.invalid || isSaving"
+                            type="submit">
+                        {{entity.id !== undefined ? 'Update' : 'Save'}}
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

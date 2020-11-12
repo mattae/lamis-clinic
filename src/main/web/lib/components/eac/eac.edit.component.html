@@ -1,0 +1,165 @@
+<div class="lamis-edit-form">
+    <div class="lamis-edit-form-container">
+        <mat-card class="default">
+            <mat-card-content>
+                <mat-progress-bar mode="determinate" class="session-progress"></mat-progress-bar>
+            </mat-card-content>
+        </mat-card>
+        <form name="form" role="form" novalidate (ngSubmit)="save()" #clinicForm="ngForm">
+            <mat-card class="default">
+                <mat-card-content *ngIf="entity.patient">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field>
+                                <mat-label>Date Last Viral Load</mat-label>
+                                <input matInput
+                                       [value]="entity.dateLastViralLoad && entity.dateLastViralLoad.format('DD MMM, YYYY')"
+                                       disabled>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field>
+                                <input matInput [value]="entity.lastViralLoad" disabled>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <input matInput [matDatepicker]="picker"
+                                   placeholder="Date of 1st EAC Session"
+                                   [(ngModel)]="entity.dateEac1"
+                                   #visit="ngModel"
+                                   (dateChange)="dateEac1Changed($event.value)"
+                                   [max]="today"
+                                   [min]="eac1Min"
+                                   name="visit"
+                                   required>
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.required)">
+                                Date of first EAC session is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
+                                Date of first EAC session cannot be before {{eac1Min | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
+                                Date of first EAC session cannot be after {{today | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width" *ngIf="entity.id && !!eac2Min">
+                            <input matInput [matDatepicker]="picker2"
+                                   placeholder="Date of 2nd EAC Session"
+                                   [(ngModel)]="entity.dateEac2"
+                                   #visit2="ngModel"
+                                   (dateChange)="dateEac2Changed($event.value)"
+                                   [max]="today"
+                                   [min]="eac2Min"
+                                   name="visit2">
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker2">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                            <mat-error
+                                    *ngIf="visit2.errors && (visit2.dirty || visit2.touched) && (visit2.errors.required)">
+                                Date of second EAC session is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit2.errors && (visit2.dirty || visit2.touched) && (visit2.errors.min)">
+                                Date of second EAC session cannot be before {{eac2Min | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit2.errors && (visit2.dirty || visit2.touched) && (visit2.errors.max)">
+                                Date of second EAC session cannot be after {{today | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width" *ngIf="entity.dateEac2 && !!eac3Min">
+                            <input matInput [matDatepicker]="picker3"
+                                   placeholder="Date of 3rd EAC Session"
+                                   [(ngModel)]="entity.dateEac3"
+                                   #visit3="ngModel"
+                                   (dateChange)="dateEac3Changed($event.value)"
+                                   [max]="today"
+                                   [min]="eac3Min"
+                                   name="visit3">
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker3">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker3></mat-datepicker>
+                            <mat-error
+                                    *ngIf="visit3.errors && (visit3.dirty || visit3.touched) && (visit3.errors.required)">
+                                Date of third EAC session is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit3.errors && (visit3.dirty || visit3.touched) && (visit3.errors.min)">
+                                Date of third EAC session cannot be before {{eac3Min | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit3.errors && (visit3.dirty || visit3.touched) && (visit3.errors.max)">
+                                Date of third EAC session cannot be after {{today | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width" *ngIf="entity.dateEac3 && !!repeatVLMin">
+                            <input matInput [matDatepicker]="picker4"
+                                   placeholder="Date of Repeat VL Sample Collection"
+                                   [(ngModel)]="entity.dateSampleCollected"
+                                   #visit4="ngModel"
+                                   [max]="repeatVLMax"
+                                   [min]="repeatVLMin"
+                                   name="repeat">
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker4">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker4></mat-datepicker>
+                            <mat-error
+                                    *ngIf="visit4.errors && (visit4.dirty || visit4.touched) && (visit4.errors.required)">
+                                Date of Repeat VL Sample Collection is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit4.errors && (visit4.dirty || visit4.touched) && (visit4.errors.min)">
+                                Date of Repeat VL Sample Collection cannot be
+                                before {{repeatVLMin | date:'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit4.errors && (visit4.dirty || visit4.touched) && (visit4.errors.max)">
+                                Date of Repeat VL Sample Collection cannot be
+                                after {{repeatVLMax | date:'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <textarea matInput placeholder="Notes"
+                                      cols="30"
+                                      rows="3"
+                                      name="notes"
+                                      #note="ngModel" [(ngModel)]="entity.notes"></textarea>
+                        </mat-form-field>
+                    </div>
+                    <mat-card-actions class="lamis-edit-form-actions">
+                        <button mat-raised-button type="button" (click)="previousState()">Back</button>
+                        <button mat-raised-button color='primary'
+                                [disabled]="clinicForm.invalid || isSaving"
+                                type="submit">
+                            {{entity.id !== undefined ? 'Update' : 'Save'}}
+                        </button>
+                    </mat-card-actions>
+                </mat-card-content>
+            </mat-card>
+        </form>
+    </div>
+</div>

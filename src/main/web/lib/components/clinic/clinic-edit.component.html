@@ -1,0 +1,672 @@
+<div class="lamis-edit-form">
+    <div class="lamis-edit-form-container">
+        <form name="form" role="form" novalidate (ngSubmit)="save()" #clinicForm="ngForm">
+            <mat-card class="default">
+                <mat-card-content *ngIf="!!entity.patient">
+                    <ng-container *ngIf="commence === true">
+                        <div>
+                            <mat-form-field class="full-width">
+                                <input matInput [matDatepicker]="picker"
+                                       placeholder="ART Start Date"
+                                       [(ngModel)]="entity.dateVisit"
+                                       #visit="ngModel"
+                                       (dateChange)="dateChanged($event.value)"
+                                       [matDatepickerFilter]="filterDates.bind(this)"
+                                       [max]="today"
+                                       [min]="dateRegistration"
+                                       name="visit"
+                                       required>
+                                <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="picker">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.required)">
+                                    {{prep ? 'Date of PrEP Initiation ' : 'ART Start Date '}}is required
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
+                                    Date of visit cannot be before {{dateRegistration | date: 'dd MMM, yyyy'}}
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
+                                    {{prep ? 'Date of PrEP Initiation ' : 'ART Start Date '}}cannot be in the future
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="row" *ngIf="!prep">
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width">
+                                    <input matInput placeholder="CD4 at start of ART" [min]="0" type="number"
+                                           #cd4="ngModel" name="cd4" [(ngModel)]="entity.cd4"/>
+                                    <mat-error
+                                            *ngIf="cd4.errors && (cd4.dirty || cd4.touched) && (cd4.errors.min)">
+                                        Minimum CD4 is 0
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width">
+                                    <input matInput placeholder="CD4 %" [min]="0" [max]="100" type="number"
+                                           #cd4p="ngModel" name="cd4p" [(ngModel)]="entity.cd4p"/>
+                                    <mat-error
+                                            *ngIf="cd4p.errors && (cd4p.dirty || cd4p.touched) && (cd4p.errors.min)">
+                                        Minimum CD4 % is 0
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="cd4p.errors && (cd4p.dirty || cd4p.touched) && (cd4p.errors.max)">
+                                        Maximum CD4 % is 100
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width">
+                                    <mat-select [(ngModel)]="entity.regimenType"
+                                                placeholder="Original Regimen Line"
+                                                #rtype="ngModel" required name="rt"
+                                                [compareWith]="entityCompare"
+                                                (selectionChange)="regimenLineChange($event.value)">
+                                        <mat-option>None</mat-option>
+                                        <mat-option *ngFor="let line of regimenLines"
+                                                    [value]="line">{{line.description}}</mat-option>
+                                        <mat-error
+                                                *ngIf="rtype.errors && (rtype.dirty || rtype.touched) && (rtype.errors.required)">
+                                            Regimen Line is required
+                                        </mat-error>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width">
+                                    <mat-select [(ngModel)]="entity.regimen"
+                                                placeholder="Original Regimen"
+                                                [compareWith]="entityCompare"
+                                                #rm="ngModel" required name="rm">
+                                        <mat-option>None</mat-option>
+                                        <mat-option *ngFor="let regimen of regimens"
+                                                    [value]="regimen">{{regimen.description}}</mat-option>
+                                        <mat-error
+                                                *ngIf="rm.errors && (rm.dirty || rm.touched) && (rm.errors.required)">
+                                            Regimen is required
+                                        </mat-error>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div *ngIf="commence === false || commence === undefined">
+                        <mat-form-field class="full-width">
+                            <input matInput [matDatepicker]="picker"
+                                   placeholder="Date of Visit"
+                                   [(ngModel)]="entity.dateVisit"
+                                   [matDatepickerFilter]="filterDates.bind(this)"
+                                   #visit="ngModel"
+                                   (dateChange)="dateChanged($event.value)"
+                                   [max]="today"
+                                   [min]="dateRegistration"
+                                   name="visit"
+                                   required>
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.required)">
+                                Date of visit is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
+                                Date of visit cannot be before {{dateRegistration | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
+                                Date of visit cannot be in the future
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <ng-container *ngIf="otzApplicable && !hasOtz">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-checkbox [(ngModel)]="fullDisclosure" name="fd">
+                                    Full Disclosure?
+                                </mat-checkbox>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width" *ngIf="fullDisclosure">
+                                    <input matInput [matDatepicker]="picker8"
+                                           placeholder="Date of Full Disclosure"
+                                           [(ngModel)]="dateOfFullDisclosure"
+                                           #dfd="ngModel"
+                                           [max]="today"
+                                           [min]="entity.patient.dateBirth"
+                                           name="dfd"
+                                           required>
+                                    <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="picker8">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker8></mat-datepicker>
+                                    <mat-error
+                                            *ngIf="dfd.errors && (dfd.dirty || dfd.touched) && (dfd.errors.required)">
+                                        Date of Full Disclosure is required
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="dfd.errors && (dfd.dirty || dfd.touched) && (dfd.errors.min)">
+                                        Date of Full Disclosure cannot be before date of
+                                        birth {{entity.patient.dateBirth | date: 'dd MMM, yyyy'}}
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="dfd.errors && (dfd.dirty || dfd.touched) && (dfd.errors.max)">
+                                        Date of Full Disclosure cannot be in the future
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <ng-container *ngIf="fullDisclosure && !hasOtz">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <mat-checkbox [(ngModel)]="enrolledOnOTZ" name="otz">
+                                        Enrolled on OTZ?
+                                    </mat-checkbox>
+                                </div>
+                                <div class="col-md-6">
+                                    <mat-form-field class="full-width" *ngIf="enrolledOnOTZ">
+                                        <input matInput [matDatepicker]="picker7"
+                                               placeholder="Date Enrolled on OTZ"
+                                               [(ngModel)]="dateEnrolledOnOTZ"
+                                               #otze="ngModel"
+                                               [max]="today"
+                                               [min]="entity.patient.dateBirth"
+                                               name="otze"
+                                               [required]="enrolledOnOTZ">
+                                        <mat-datepicker-toggle
+                                                matSuffix
+                                                [for]="picker7">
+                                        </mat-datepicker-toggle>
+                                        <mat-datepicker #picker7></mat-datepicker>
+                                        <mat-error
+                                                *ngIf="otze.errors && (otze.dirty || otze.touched) && (otze.errors.required)">
+                                            Date enrolled on OTZ is required
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="otze.errors && (otze.dirty || otze.touched) && (otze.errors.min)">
+                                            Date enrolled on OTZ cannot be before date of
+                                            birth {{entity.patient.dateBirth | date: 'dd MMM, yyyy'}}
+                                        </mat-error>
+                                        <mat-error
+                                                *ngIf="otze.errors && (otze.dirty || otze.touched) && (otze.errors.max)">
+                                            Date enrolled on OTZ cannot be in the future
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <ng-container *ngIf="enrolledOnOTZ">
+                                <fieldset>
+                                    <legend>OTZ</legend>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>Caregiver Phone</mat-label>
+                                                <input matInput name="phone" [(ngModel)]="caregiverPhone"
+                                                       #phone="ngModel"
+                                                       phoneNumber/>
+                                                <mat-error
+                                                        *ngIf="phone.errors && (phone.dirty || phone.touched) && (phone.errors.required)">
+                                                    Caregiver phone number is required
+                                                </mat-error>
+                                                <mat-error
+                                                        *ngIf="phone.errors && (phone.dirty || phone.touched || !!entity.id) && (phone.errors.phoneNumber)">
+                                                    Invalid phone number
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <mat-form-field class="full-width">
+                                                <mat-label>Caregiver Address</mat-label>
+                                                <textarea matInput name="address" [(ngModel)]="caregiverAddress"
+                                                          #address="ngModel"
+                                                          rows="2">
+                                            </textarea>
+                                                <mat-error
+                                                        *ngIf="address.errors && (address.dirty || address.touched) && (address.errors.required)">
+                                                    Case Manager address is required
+                                                </mat-error>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </ng-container>
+                        </ng-container>
+                    </ng-container>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <mat-select [(ngModel)]="entity.clinicStage"
+                                        placeholder="Clinical Stage"
+                                        #clinicStage="ngModel" name="cs">
+                                <mat-option>None</mat-option>
+                                <mat-option [value]="'Stage I'">Stage I</mat-option>
+                                <mat-option [value]="'Stage II'">Stage II</mat-option>
+                                <mat-option [value]="'Stage III'">Stage III</mat-option>
+                                <mat-option [value]="'Stage IV'">Stage IV</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <mat-select [(ngModel)]="entity.funcStatus"
+                                        placeholder="Functional Status"
+                                        #funcStatus="ngModel" name="fs">
+                                <mat-option>None</mat-option>
+                                <mat-option [value]="'Working'">Working</mat-option>
+                                <mat-option [value]="'Ambulatory'">Ambulatory</mat-option>
+                                <mat-option [value]="'Bedridden'">Bedridden</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <ng-container *ngIf="prep">
+                        <fieldset>
+                            <legend>PrEP</legend>
+                            <div *ngIf="commence">
+                                <mat-form-field class="full-width">
+                                    <mat-select [(ngModel)]="hivTestResult"
+                                                placeholder="HIV Status at PrEP Initiation"
+                                                required
+                                                #hivStatus="ngModel" name="htr">
+                                        <mat-option>None</mat-option>
+                                        <mat-option [value]="'NEGATIVE'">Negative</mat-option>
+                                        <mat-option [value]="'POSITIVE'">Positive</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                            *ngIf="hivStatus.errors && (hivStatus.dirty || hivStatus.touched) && (hivStatus.errors.required)">
+                                        HIV Status is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="!commence">
+                                <mat-form-field class="full-width">
+                                    <mat-select [(ngModel)]="hivTestResult"
+                                                placeholder="HIV Status /Test Result"
+                                                required
+                                                #hivStatus="ngModel" name="htr">
+                                        <mat-option>None</mat-option>
+                                        <mat-option [value]="'NEGATIVE'">Negative</mat-option>
+                                        <mat-option [value]="'POSITIVE'">Positive</mat-option>
+                                        <mat-option [value]="'NOT_DONE'">Not Done</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                            *ngIf="hivStatus.errors && (hivStatus.dirty || hivStatus.touched) && (hivStatus.errors.required)">
+                                        HIV Status is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <ng-container *ngIf="commence">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field class="full-width">
+                                            <input matInput [(ngModel)]="creatinineClearance"
+                                                   placeholder="Creatinine Clearance (mL/min)"
+                                                   #creatinine="ngModel" name="creatinine"/>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <mat-form-field class="full-width">
+                                            <mat-select [(ngModel)]="urinalysis"
+                                                        placeholder="Urinalysis"
+                                                        #urinal="ngModel" name="urinalysis">
+                                                <mat-option>None</mat-option>
+                                                <mat-option [value]="'Normal'">Normal</mat-option>
+                                                <mat-option [value]="'Deranged'">Deranged</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <mat-form-field class="full-width">
+                                            <mat-select [(ngModel)]="hepatitisB"
+                                                        placeholder="Hepatitis B Screening"
+                                                        #hepatitisb="ngModel" name="hepatitisB">
+                                                <mat-option>None</mat-option>
+                                                <mat-option [value]="'Positive'">Positive</mat-option>
+                                                <mat-option [value]="'Negative'">Negative</mat-option>
+                                                <mat-option [value]="'Not Done'">Not Done</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <mat-form-field class="full-width">
+                                            <mat-select [(ngModel)]="hepatitisC"
+                                                        placeholder="Hepatitis C Screening"
+                                                        #hepatitisb="ngModel" name="hepatitisC">
+                                                <mat-option>None</mat-option>
+                                                <mat-option [value]="'Positive'">Positive</mat-option>
+                                                <mat-option [value]="'Negative'">Negative</mat-option>
+                                                <mat-option [value]="'Not Done'">Not Done</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </fieldset>
+                    </ng-container>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <mat-select [(ngModel)]="entity.tbStatus"
+                                        placeholder="TB Status"
+                                        name="tb"
+                                        #tbStatus="ngModel">
+                                <mat-option>None</mat-option>
+                                <mat-option [value]="'No sign or symptoms of TB'">No sign or symptoms of TB</mat-option>
+                                <mat-option [value]="'TB suspected and referred for evaluation'">TB suspected and
+                                    referred
+                                    for evaluation
+                                </mat-option>
+                                <mat-option [value]="'Currently on INH prophylaxis'">Currently on INH prophylaxis
+                                </mat-option>
+                                <mat-option [value]="'Currently on TB treatment'">Currently on TB treatment</mat-option>
+                                <mat-option [value]="'TB positive not on TB drugs'">TB positive not on TB drugs
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <input matInput placeholder="Body weight(Kg)" [min]="0" [max]="250" type="number"
+                                   #weight="ngModel" name="weight" [(ngModel)]="entity.bodyWeight"/>
+                            <mat-error
+                                    *ngIf="weight.errors && (weight.dirty || weight.touched) && (weight.errors.min)">
+                                Minimum body weight is 0
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="weight.errors && (weight.dirty || weight.touched) && (weight.errors.max)">
+                                Maximum body weight is 250
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <input matInput placeholder="Height (m)" [min]="0" [max]="1.8" type="number"
+                                   #height="ngModel" name="height" [(ngModel)]="entity.height"/>
+                            <mat-error
+                                    *ngIf="height.errors && (height.dirty || height.touched) && (height.errors.min)">
+                                Minimum height is 0
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="height.errors && (height.dirty || height.touched) && (height.errors.max)">
+                                Maximum height is 1.8m
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <fieldset>
+                        <h6>Blood Pressure(mmHg)</h6>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <mat-form-field class="full-width">
+                                    <input matInput placeholder="Systolic"
+                                           name="bp1" type="number"
+                                           [max]="190"
+                                           [min]="70"
+                                           [required]="!!entity.bp2"
+                                           #bp1="ngModel" [(ngModel)]="entity.bp1"/>
+                                    <mat-error
+                                            *ngIf="bp1.errors && (bp1.dirty || bp1.touched) && (bp1.errors.max)">
+                                        Maximum Systolic is 190
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="bp1.errors && (bp1.dirty || bp1.touched) && (bp1.errors.min)">
+                                        Minimum Systolic is 70
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="bp1.errors && (bp1.dirty || bp1.touched) && (bp1.errors.required)">
+                                        Systolic is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-md-3">
+                                <mat-form-field class="full-width">
+                                    <input matInput placeholder="Diastolic"
+                                           name="bp2" type="number"
+                                           [max]="100"
+                                           [min]="40"
+                                           [required]="!!entity.bp1"
+                                           #bp2="ngModel" [(ngModel)]="entity.bp2"/>
+                                    <mat-error
+                                            *ngIf="bp2.errors && (bp2.dirty || bp2.touched) && (bp2.errors.max)">
+                                        Maximum Diastolic is 100
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="bp2.errors && (bp2.dirty || bp2.touched) && (bp2.errors.min)">
+                                        Minimum Diastolic is 40
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="bp2.errors && (bp2.dirty || bp2.touched) && (bp2.errors.required)">
+                                        Diastolic is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div *ngIf="entity.patient && entity.patient.gender === 'FEMALE'">
+                        <mat-form-field class="full-width">
+                            <mat-select [(ngModel)]="entity.pregnancyStatus"
+                                        placeholder="Pregnancy Status"
+                                        #pregStatus="ngModel" name="ps">
+                                <mat-option>None</mat-option>
+                                <mat-option [value]="1">Not Pregnant</mat-option>
+                                <mat-option [value]="2">Pregnant</mat-option>
+                                <mat-option [value]="3">Breastfeeding</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div *ngIf="entity.patient && entity.patient.gender === 'FEMALE' && lmpMin">
+                        <mat-form-field class="full-width">
+                            <input matInput [matDatepicker]="picker1"
+                                   placeholder="LMP"
+                                   [(ngModel)]="entity.lmp"
+                                   #lmp="ngModel"
+                                   [max]="entity.dateVisit"
+                                   [min]="lmpMin"
+                                   name="lmp">
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker1">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker1></mat-datepicker>
+                            <mat-error
+                                    *ngIf="lmp.errors && (lmp.dirty || lmp.touched) && (lmp.errors.max)">
+                                LMP cannot be after {{entity.dateVisit | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="lmp.errors && (lmp.dirty || lmp.touched) && (lmp.errors.min)">
+                                LMP cannot be before {{lmpMin | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <mat-select [(ngModel)]="oiList"
+                                        placeholder="Opportunistic Infections"
+                                        [compareWith]="entityCompare"
+                                        name="ois"
+                                        #oiIds="ngModel" multiple>
+                                <mat-option>None</mat-option>
+                                <mat-option *ngFor="let oi of opportunisticInfections"
+                                            [value]="oi">{{oi.description}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <mat-checkbox [(ngModel)]="adr"
+                                          name="ad">Adverse Drug Reaction Screened?
+                            </mat-checkbox>
+                        </div>
+                        <div style="height: 300px; overflow-y: auto;" *ngIf="adr" class="col-md-8">
+                            <adf-datatable [rows]="selectedClinicAdr"
+                                           [stickyHeader]="true">
+                                <data-columns>
+                                    <data-column key="adverseDrugReaction.description" title="Description"
+                                                 sortable="true"></data-column>
+                                    <data-column key="severity" title="Severity" sortable="false">
+                                        <ng-template let-context="$implicit">
+                                            <mat-form-field class="full-width">
+                                                <mat-select autofocus
+                                                            [value]="context.row.getValue('severity')"
+                                                            name="severity"
+                                                            (valueChange)="updateValue($event, 'severity', context.row.getValue('adverseDrugReaction'))">
+                                                    <mat-option>None</mat-option>
+                                                    <mat-option [value]="'Grade 1'">Grade 1</mat-option>
+                                                    <mat-option [value]="'Grade 2'">Grade 2</mat-option>
+                                                    <mat-option [value]="'Grade 3'">Grade 3</mat-option>
+                                                    <mat-option [value]="'Grade 4'">Grade 4</mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </ng-template>
+                                    </data-column>
+                                </data-columns>
+                            </adf-datatable>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width">
+                                <mat-select [(ngModel)]="entity.adherenceLevel"
+                                            placeholder="Level of Adherence"
+                                            #adherence="ngModel" name="al">
+                                    <mat-option>None</mat-option>
+                                    <mat-option [value]="'Good'">Good</mat-option>
+                                    <mat-option [value]="'Fair'">Fair</mat-option>
+                                    <mat-option [value]="'Poor'">Poor</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width"
+                                            *ngIf="entity.adherenceLevel === 'Fair' || entity.adherenceLevel === 'Poor'">
+                                <mat-select [(ngModel)]="adhereList"
+                                            placeholder="Adherence"
+                                            name="ads"
+                                            [compareWith]="entityCompare"
+                                            #adrIds="ngModel" multiple>
+                                    <mat-option>None</mat-option>
+                                    <mat-option *ngFor="let adhere of adheres"
+                                                [value]="adhere">{{adhere.description}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <ng-container *ngIf="otzApplicable || enrolledOnOTZ">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-checkbox [(ngModel)]="attendedLastOTZMeeting" name="aotz">
+                                    Attended last support group (OTZ club) meeting?
+                                </mat-checkbox>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width" *ngIf="attendedLastOTZMeeting">
+                                    <input matInput [matDatepicker]="picker8"
+                                           placeholder="Date of Last OTZ Club Meeting"
+                                           [(ngModel)]="dateLastOTZMeeting"
+                                           #lotzm="ngModel"
+                                           [max]="today"
+                                           [min]="dateEnrolledOnOTZ"
+                                           name="lotzm"
+                                           [required]="attendedLastOTZMeeting">
+                                    <mat-datepicker-toggle
+                                            matSuffix
+                                            [for]="picker8">
+                                    </mat-datepicker-toggle>
+                                    <mat-datepicker #picker8></mat-datepicker>
+                                    <mat-error
+                                            *ngIf="lotzm.errors && (lotzm.dirty || lotzm.touched) && (lotzm.errors.required)">
+                                        Date of Last OTZ meeting is required
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="lotzm.errors && (lotzm.dirty || lotzm.touched) && (lotzm.errors.min)">
+                                        Date of last OTZ meeting cannot be
+                                        before {{dateEnrolledOnOTZ | date: 'dd MMM, yyyy'}}
+                                    </mat-error>
+                                    <mat-error
+                                            *ngIf="lotzm.errors && (lotzm.dirty || lotzm.touched) && (lotzm.errors.max)">
+                                        Date of last OTZ meeting cannot be in the future
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <mat-form-field class="full-width">
+                                    <mat-select name="modules" [(ngModel)]="modulesCompleted" #modules="ngModel"
+                                                [required]="attendedLastOTZMeeting">
+                                        <mat-option></mat-option>
+                                        <mat-option [value]="1">1</mat-option>
+                                        <mat-option [value]="2">2</mat-option>
+                                        <mat-option [value]="3">3</mat-option>
+                                        <mat-option [value]="4">4</mat-option>
+                                        <mat-option [value]="5">5</mat-option>
+                                        <mat-option [value]="6">6</mat-option>
+                                        <mat-option [value]="7">7</mat-option>
+                                    </mat-select>
+                                    <mat-error
+                                            *ngIf="modules.errors && (modules.dirty || modules.touched) && (modules.errors.required)">
+                                        Number of modules attended required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </ng-container>
+                    <div *ngIf="!!appointmentMin">
+                        <mat-form-field class="full-width">
+                            <input matInput [matDatepicker]="picker2"
+                                   placeholder="Date of Next Appointment"
+                                   [(ngModel)]="entity.nextAppointment"
+                                   #na="ngModel"
+                                   [min]="appointmentMin"
+                                   [max]="appointmentMax"
+                                   name="na"
+                                   required>
+                            <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker2">
+                            </mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                            <mat-error
+                                    *ngIf="na.errors && (na.dirty || na.touched) && (na.errors.required)">
+                                Date of next appointment is required
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="na.errors && (na.dirty || na.touched) && (na.errors.max)">
+                                Date of next appointment cannot be after {{appointmentMax | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                            <mat-error
+                                    *ngIf="na.errors && (na.dirty || na.touched) && (na.errors.min)">
+                                Date of next appointment cannot be before {{appointmentMin | date: 'dd MMM, yyyy'}}
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div>
+                        <mat-form-field class="full-width">
+                            <textarea matInput placeholder="Clinical Notes"
+                                      cols="30"
+                                      rows="3"
+                                      name="notes"
+                                      #note="ngModel" [(ngModel)]="entity.notes"></textarea>
+                        </mat-form-field>
+                    </div>
+                    <mat-card-actions class="lamis-edit-form-actions">
+                        <button mat-raised-button type="button" (click)="previousState()">Back</button>
+                        <button mat-raised-button color='primary'
+                                [disabled]="clinicForm.invalid || isSaving"
+                                type="submit">
+                            {{entity.id !== undefined ? 'Update' : 'Save'}}
+                        </button>
+                    </mat-card-actions>
+                </mat-card-content>
+            </mat-card>
+        </form>
+    </div>
+</div>

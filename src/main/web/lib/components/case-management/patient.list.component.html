@@ -1,0 +1,288 @@
+<div class="layout">
+    <div class="list-container">
+        <mat-card>
+            <mat-card-content>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>Facility Case Manager:</mat-label>
+                            <mat-select [(ngModel)]="caseManager" name="caseManager"
+                                        (selectionChange)="caseManagerChanged()">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let c of caseManagers" [value]="c">{{c.name}}
+                                </mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                        <div *ngIf="caseManager">
+                            <mat-checkbox [(ngModel)]="filterByCaseManager"
+                                          (change)="updateList()"
+                                          name="activeTb"
+                            >
+                                Filter by Case Manager
+                            </mat-checkbox>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div *ngIf="caseManager">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Clients(s) Assigned:
+                                </div>
+                                <div class="col-md-2">
+                                    {{stats.assigned | number: '1.'}}
+                                </div>
+                                <div class="col-md-2">
+                                    Stable 1 Year:
+                                </div>
+                                <div class="col-md-2">
+                                    {{stats.stable | number: '1.'}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Unstable less than 1 Year:
+                                </div>
+                                <div class="col-md-2">
+                                    {{stats.unstableLessThan1year | number: '1.'}}
+                                </div>
+                                <div class="col-md-2">
+                                    Unstable more than 1 Year:
+                                </div>
+                                <div class="col-md-2">
+                                    {{stats.unstableMoreThan1Year | number: '1.'}}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2">
+                                    Awaiting ART:
+                                </div>
+                                <div class="col-md-2">
+                                    {{stats.preArt | number: '1.'}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <h5> Demographic/Clinic filters</h5>
+                <p></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>Client Categorization</mat-label>
+                            <mat-select name="categoryId" [(ngModel)]="filter.status" (selectionChange)="updateList()">
+                                <mat-option>--All--</mat-option>
+                                <mat-option value='STABLE'>Stable One Year</mat-option>
+                                <mat-option value='UNSTABLE_LESS_THAN_1_YEAR'>Unstable less than One Year</mat-option>
+                                <mat-option value='UNSTABLE_MORE_THAN_1_YEAR'>Unstable One Year or more</mat-option>
+                                <mat-option value='PRE_ART'>Awaiting ART</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>Age Group</mat-label>
+                            <mat-select name="ageGroup" [(ngModel)]="ageLimit" (selectionChange)="ageGroupChanged()">
+                                <mat-option>--All--</mat-option>
+                                <mat-option value='9'>Children (0-9 Years)</mat-option>
+                                <mat-option value='14'>Younger Adolescent (10 to 14 Years)</mat-option>
+                                <mat-option value='19'>Older Adolescent (15 to 19 Years)</mat-option>
+                                <mat-option value='24'>Young People (20 to 24 Years)</mat-option>
+                                <mat-option value='100'>Adults (25 and Above)</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>Gender</mat-label>
+                            <mat-select name="gender" [(ngModel)]="filter.gender" (selectionChange)="updateList()">
+                                <mat-option>--All--</mat-option>
+                                <mat-option [value]="'FEMALE'">Female</mat-option>
+                                <mat-option [value]="'MALE'">Male</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>Pregnancy Status</mat-label>
+                            <mat-select name="pregnancyStatus" [(ngModel)]="pregnancyStatus"
+                                        (selectionChange)="pregnancyStatusChanged()">
+                                <mat-option>--All--</mat-option>
+                                <mat-option value='1'>Pregnant</mat-option>
+                                <mat-option value='2'>Breastfeeding</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>State of Residence</mat-label>
+                            <mat-select name="state" (selectionChange)="stateChanged($event.value.id)">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let state of states" [value]="state">{{state.name}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-md-6">
+                        <mat-form-field class="full-width">
+                            <mat-label>LGA of Residence</mat-label>
+                            <mat-select name="lga" (selectionChange)="lgaChanged($event.value.id)">
+                                <mat-option></mat-option>
+                                <mat-option *ngFor="let lga of lgas" [value]="lga">{{lga.name}}</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div *ngIf="patients?.length">
+                    <div class="row">
+                        <div class="col-md-2">
+                            Clients(s) Assigned:
+                        </div>
+                        <div class="col-md-2">
+                            {{globalStats.assigned | number: '1.'}}
+                        </div>
+                        <div class="col-md-2">
+                            Stable 1 Year:
+                        </div>
+                        <div class="col-md-2">
+                            {{globalStats.stable | number: '1.'}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            Unstable less than 1 Year:
+                        </div>
+                        <div class="col-md-2">
+                            {{globalStats.unstableLessThan1year | number: '1.'}}
+                        </div>
+                        <div class="col-md-2">
+                            Unstable more than 1 Year:
+                        </div>
+                        <div class="col-md-2">
+                            {{globalStats.unstableMoreThan1Year | number: '1.'}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2">
+                            Awaiting ART:
+                        </div>
+                        <div class="col-md-2">
+                            {{globalStats.preArt | number: '1.'}}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="row">
+                        <div class="col-md-8 col-md-offset-4">
+                            <div class="adf-toolbar--spacer"></div>
+                            <td-search-box backIcon="arrow_back" class="push-right-sm"
+                                           placeholder="Search hospital number" [debounce]="500"
+                                           [(ngModel)]="hospitalNum"
+                                           (searchDebounce)="search()"
+                                           (search)="search()"
+                                           (clear)="clearHospitalNum()" flex>
+                            </td-search-box>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width">
+                                <mat-label>Assign to Case Manager:</mat-label>
+                                <mat-select [(ngModel)]="assignCaseManager" name="caseManager1">
+                                    <mat-option></mat-option>
+                                    <mat-option *ngFor="let c of caseManagers" [value]="c">{{c.name}}
+                                    </mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 col-sm-offset-9">
+                            <div>
+                                <button mat-raised-button color="primary"
+                                        *ngIf="assignCaseManager && selections()"
+                                        (click)="assignClients()">Assign to Case Manager
+                                </button>
+                                <button mat-raised-button color="accent" *ngIf="selections()"
+                                        (click)="deAssignClients()">De-assign Client(s)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <mat-progress-spinner
+                            *ngIf="initializing"
+                            class="adf-document-list-loading-margin"
+                            [color]="'primary'"
+                            [mode]="'indeterminate'">
+                    </mat-progress-spinner>
+                    <adf-datatable *ngIf="patients || loading"
+                                   [rows]="patients"
+                                   (rowClick)="select($event.value)">
+                        <data-columns>
+                            <data-column key="selected" title="">
+                                <ng-template let-context="$implicit">
+                                    <mat-checkbox [checked]="context.row.getValue('selected')"></mat-checkbox>
+                                </ng-template>
+                            </data-column>
+                            <data-column key="name" title="Name" sortable="true"></data-column>
+                            <data-column key="hospitalNum" title="Hospital Number" sortable="true"></data-column>
+                            <data-column key="gender" title="Gender" sortable="true">
+                                <ng-template let-context="$implicit">
+                                    {{context.row.getValue('gender') === 'MALE' ? 'Male' : context.row.getValue('gender') === 'FEMALE' ? 'Female' : ''}}
+                                </ng-template>
+                            </data-column>
+                            <data-column key="dateBirth" title="Date of Birth" sortable="true">
+                                <ng-template let-context="$implicit">
+                                    {{context.row.getValue('dateBirth') | date: 'dd MMM, yyyy'}}
+                                </ng-template>
+                            </data-column>
+                            <data-column key="address" title="Address" class="full-width ellipsis-cell"></data-column>
+                            <data-column key="currentStatus" title="ART Status" sortable="true"></data-column>
+                            <data-column key="caseManager.name" title="Assigned to" sortable="true"></data-column>
+                        </data-columns>
+                        <adf-loading-content-template>
+                            <ng-template>
+                                <mat-progress-spinner
+                                        class="adf-document-list-loading-margin"
+                                        [color]="'primary'"
+                                        [mode]="'indeterminate'">
+                                </mat-progress-spinner>
+                            </ng-template>
+                        </adf-loading-content-template>
+                    </adf-datatable>
+                </div>
+                <adf-empty-content
+                        *ngIf="!patients"
+                        icon="blur_on"
+                        [title]="'No Patients found'"
+                        [subtitle]="'No Patients matching search criteria or no Patients available'">
+                </adf-empty-content>
+                <div class="row">
+                    <div class="col-md-8">
+                        <ngb-pagination [collectionSize]="totalItems"
+                                        [(page)]="page"
+                                        [pageSize]="itemsPerPage"
+                                        [maxSize]="5"
+                                        size="sm"
+                                        [rotate]="true"
+                                        [boundaryLinks]="true"
+                                        (pageChange)="loadPage(page)">
+                        </ngb-pagination>
+                    </div>
+                    <div class="col-md-4">
+                        <mat-form-field>
+                            <mat-label>Assignment Filter</mat-label>
+                            <mat-select (selectionChange)="assigned($event.value)">
+                                <mat-option></mat-option>
+                                <mat-option [value]="1">Only assigned clients</mat-option>
+                                <mat-option [value]="2">Only clients not assigned</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
