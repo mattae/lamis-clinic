@@ -2,7 +2,7 @@ package org.fhi360.lamis.modules.clinic.web.rest;
 
 import lombok.RequiredArgsConstructor;
 import org.fhi360.lamis.modules.clinic.service.CervicalCancerScreeningService;
-import org.fhi360.lamis.modules.clinic.web.rest.vm.ScreeningVM;
+import org.fhi360.lamis.modules.clinic.web.rest.vm.ObservationVM;
 import org.lamisplus.modules.lamis.legacy.domain.entities.Observation;
 import org.lamisplus.modules.lamis.legacy.domain.repositories.ObservationRepository;
 import org.lamisplus.modules.lamis.legacy.domain.repositories.PatientRepository;
@@ -19,7 +19,7 @@ public class CervicalCancerScreenResource {
     private final PatientRepository patientRepository;
 
     @PostMapping("/cervical-cancer-screenings")
-    public void saveScreening(@RequestBody ScreeningVM vm) {
+    public void saveScreening(@RequestBody ObservationVM vm) {
         screeningService.saveScreening(vm.getPatient(), vm.getDate(), vm.getData());
     }
 

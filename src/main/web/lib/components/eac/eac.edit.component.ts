@@ -6,7 +6,7 @@ import {HttpErrorResponse, HttpResponse} from '@angular/common/http';
 import {ClinicService} from '../../services/clinic.service';
 import {NotificationService} from '@alfresco/adf-core';
 import {ActivatedRoute} from '@angular/router';
-import {AppLoaderService} from '@lamis/web-core';
+import {AppLoaderService, DATE_FORMAT} from '@lamis/web-core';
 import {EAC, Patient} from '../../model/clinic.model';
 import {EacService} from '../../services/eac.service';
 import {catchError, tap} from 'rxjs/operators';
@@ -28,7 +28,10 @@ export class EacEditComponent implements OnInit {
     eac3Min: Moment;
     repeatVLMin: Moment;
     repeatVLMax: Moment;
-    isSaving: boolean = false;
+    completionMin: Moment;
+    isSaving = false;
+    completed: boolean;
+    dateCompleted: Moment;
 
     constructor(private clinicService: ClinicService,
                 private eacService: EacService,
@@ -44,7 +47,6 @@ export class EacEditComponent implements OnInit {
     ngOnInit(): void {
         this.activatedRoute.data.subscribe(({entity}) => {
             this.entity = !!entity && entity.body ? entity.body : entity;
-
             if (this.entity === undefined) {
                 this.entity = this.createEntity();
             }
@@ -63,10 +65,20 @@ export class EacEditComponent implements OnInit {
                             this.entity.dateLastViralLoad;
                         this.eac3Min = this.entity.dateEac2 ? this.entity.dateEac2.clone().add(2, 'week') :
                             this.entity.dateLastViralLoad;
+                        this.completionMin = this.entity.dateEac3 ? this.entity.dateEac3.clone().add(0, 'days') : null;
+
+                        if (this.entity.extra) {
+                            this.completed = !!this.entity.extra.completed;
+                            this.dateCompleted = this.entity.extra.dateCompleted != null ? moment(this.entity.extra.dateCompleted) : null;
+                        }
                     });
                 }
             });
 
+            if (this.entity.extra) {
+                this.completed = !!this.entity.extra.completed;
+                this.dateCompleted = this.entity.extra.dateCompleted != null ? moment(this.entity.extra.dateCompleted) : null;
+            }
         });
     }
 
@@ -81,6 +93,7 @@ export class EacEditComponent implements OnInit {
                     this.entity.dateLastViralLoad;
                 this.repeatVLMin = this.entity.dateEac3 ? this.entity.dateEac3.clone().add(1, 'day') :
                     this.entity.dateLastViralLoad;
+                this.completionMin = this.entity.dateEac3 ? this.entity.dateEac3.clone().add(0, 'days') : null;
             }),
             catchError((err: any) => {
                 this.entity.dateLastViralLoad = null;
@@ -92,6 +105,7 @@ export class EacEditComponent implements OnInit {
                     this.entity.dateLastViralLoad;
                 this.repeatVLMin = this.entity.dateEac3 ? this.entity.dateEac3.clone().add(1, 'day') :
                     this.entity.dateLastViralLoad;
+                this.completionMin = this.entity.dateEac3 ? this.entity.dateEac3.clone().add(0, 'days') : null;
                 return null;
             }));
     }
@@ -107,13 +121,22 @@ export class EacEditComponent implements OnInit {
 
     dateEac3Changed(date: Moment) {
         this.repeatVLMin = date.clone().add(1, 'days');
+        this.completionMin = date.clone().add(0, 'days');
         this.repeatVLMax = date.clone().add(6, 'months');
     }
 
     save() {
-        //this.submitButton.disabled = true;
-        //this.progressBar.mode = 'indeterminate';
+        // this.submitButton.disabled = true;
+        // this.progressBar.mode = 'indeterminate';
         this.isSaving = true;
+        if (!this.completed) {
+            this.dateCompleted = null;
+        }
+        if (!this.entity.extra) {
+            this.entity.extra = {};
+        }
+        this.entity.extra.completed = !!this.completed;
+        this.entity.extra.dateCompleted = this.dateCompleted != null ? this.dateCompleted.format(DATE_FORMAT) : null;
         this.appLoaderService.open('Saving EAC session..');
         if (this.entity.id !== undefined) {
             this.subscribeToSaveResponse(this.eacService.update(this.entity));
@@ -138,16 +161,16 @@ export class EacEditComponent implements OnInit {
     private onSaveSuccess(result: any) {
         this.appLoaderService.close();
         this.isSaving = false;
-        this.notification.openSnackMessage('EAC session successfully saved');
+        this.notification.showInfo('EAC session successfully saved');
         this.previousState();
     }
 
     private onSaveError() {
         this.isSaving = false;
         this.appLoaderService.close();
-        //this.submitButton.disabled = true;
+        // this.submitButton.disabled = true;
         this.notification.showError('Error occurred saving EAC session; try again');
-        //this.progressBar.mode = 'determinate';
+        // this.progressBar.mode = 'determinate';
     }
 
     protected onError(errorMessage: string) {

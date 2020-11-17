@@ -1,0 +1,134 @@
+<div class="lamis-edit-form">
+    <div class="lamis-edit-form-container">
+        <form name="form" role="form" novalidate (ngSubmit)="save()" #screeningForm="ngForm">
+            <mat-card class="default">
+                <mat-card-content *ngIf="patient">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width">
+                                <input matInput [matDatepicker]="picker"
+                                       placeholder="Date of Screening"
+                                       [(ngModel)]="entity.dateScreened"
+                                       #visit="ngModel"
+                                       [max]="today"
+                                       [min]="patient.dateBirth"
+                                       name="visit"
+                                       required>
+                                <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="picker">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.required)">
+                                    Date of Screening is required
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
+                                    Date of Screening cannot be before {{patient.dateBirth}}
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
+                                    Date of Screening cannot be in the future
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <mat-checkbox [(ngModel)]="entity.confirmed"
+                                          name="uibn"
+                            >
+                                COVID19 Confirmed?
+                            </mat-checkbox>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width">
+                                <input matInput [matDatepicker]="picker1"
+                                       placeholder="Date of COVID19 Result"
+                                       [(ngModel)]="entity.dateConfirmed"
+                                       #visit1="ngModel"
+                                       [max]="today"
+                                       [min]="entity.dateScreened"
+                                       name="visit1"
+                                       required>
+                                <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="picker1">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker1></mat-datepicker>
+                                <mat-error
+                                        *ngIf="visit1.errors && (visit1.dirty || visit1.touched) && (visit1.errors.required)">
+                                    Date Confirmed is required
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit1.errors && (visit1.dirty || visit1.touched) && (visit1.errors.min)">
+                                    Date Confirmed cannot be before {{entity.dateConfirmed | date: 'dd MMM, yyyy'}}
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit1.errors && (visit1.dirty || visit1.touched) && (visit1.errors.max)">
+                                    Date Confirmed cannot be in the future
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <div class="row" *ngIf="entity.confirmed">
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width">
+                                <mat-label>COVID19 Screening Outcome</mat-label>
+                                <mat-select name="pc" [(ngModel)]="entity.outcome"
+                                            #pc="ngModel" [required]="entity.confirmed">
+                                    <mat-option></mat-option>
+                                    <mat-option [value]="'Discharged'">Discharged</mat-option>
+                                    <mat-option [value]="'Dead'">Dead</mat-option>
+                                    <mat-option [value]="'Admitted'">Admitted</mat-option>
+                                </mat-select>
+                                <mat-error
+                                        *ngIf="pc.errors && (pc.dirty || pc.touched) && (pc.errors.required)">
+                                    Outcome is required
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width" *ngIf="entity.outcome">
+                                <input matInput [matDatepicker]="picker2"
+                                       placeholder="Date of COVID19 Outcome"
+                                       [(ngModel)]="entity.dateOutcome"
+                                       #treat="ngModel"
+                                       [max]="today"
+                                       [min]="entity.dateScreened"
+                                       name="treat"
+                                       required>
+                                <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="picker2">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker2></mat-datepicker>
+                                <mat-error
+                                        *ngIf="treat.errors && (treat.dirty || treat.touched) && (treat.errors.required)">
+                                    Date of outcome is required
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="treat.errors && (treat.dirty || treat.touched) && (treat.errors.min)">
+                                    Date of outcome cannot be before {{entity.dateScreened | date: 'dd MMM, yyyy'}}
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="treat.errors && (treat.dirty || treat.touched) && (treat.errors.max)">
+                                    Date of outcome cannot be in the future
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="lamis-edit-form-actions">
+                    <button mat-raised-button type="button" (click)="previousState()">Back</button>
+                    <button mat-raised-button color='primary'
+                            [disabled]="screeningForm.invalid || isSaving"
+                            type="submit">
+                        {{!!observation.id ? 'Update' : 'Save'}}
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </form>
+    </div>
+</div>

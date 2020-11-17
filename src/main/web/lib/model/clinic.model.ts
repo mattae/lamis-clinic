@@ -209,12 +209,13 @@ export interface EAC {
     lastViralLoad?: number;
     notes?: string;
     uuid?: string;
+    extra?: any;
 }
 
 export interface Observation {
     id?: string;
     date?: Moment;
-    data?: CervicalCancerScreening;
+    data?: any;
 }
 
 export interface CervicalCancerScreening {
@@ -225,4 +226,12 @@ export interface CervicalCancerScreening {
     screeningResult?: string;
     referredForTreatment?: boolean;
     dateTreated?: Moment;
+}
+
+export interface COVIDCancerScreening {
+    dateScreened?: Moment;
+    confirmed?: boolean;
+    dateConfirmed?: Moment;
+    outcome?: string;
+    dateOutcome?: Moment;
 }

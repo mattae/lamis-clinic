@@ -41,6 +41,7 @@ public class CervicalCancerScreeningService {
         }
         observation.setDate(date);
         observation.setData(data);
+        observationRepository.save(observation);
     }
 
     public void deleteScreening(Patient patient) {

@@ -46,7 +46,7 @@ export const ROUTES: Routes = [
                     title: 'Cervical Cancer Screening',
                     breadcrumb: 'CERVICAL CANCER SCREENING'
                 },
-                //canActivate: [UserRouteAccessService]
+                // canActivate: [UserRouteAccessService]
             },
             {
                 path: 'patient/:patientId/new',
@@ -56,7 +56,7 @@ export const ROUTES: Routes = [
                     title: 'Cervical Cancer Screening',
                     breadcrumb: 'ADD CERVICAL CANCER SCREENING'
                 },
-                //canActivate: [UserRouteAccessService]
+                // canActivate: [UserRouteAccessService]
             },
             {
                 path: ':id/patient/:patientId/edit',
@@ -69,7 +69,7 @@ export const ROUTES: Routes = [
                     title: 'Cervical Cancer Screening',
                     breadcrumb: 'CERVICAL CANCER SCREENING EDIT'
                 },
-                //canActivate: [UserRouteAccessService]
+                // canActivate: [UserRouteAccessService]
             }
         ]
     }

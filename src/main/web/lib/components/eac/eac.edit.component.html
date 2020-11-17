@@ -1,10 +1,5 @@
 <div class="lamis-edit-form">
     <div class="lamis-edit-form-container">
-        <mat-card class="default">
-            <mat-card-content>
-                <mat-progress-bar mode="determinate" class="session-progress"></mat-progress-bar>
-            </mat-card-content>
-        </mat-card>
         <form name="form" role="form" novalidate (ngSubmit)="save()" #clinicForm="ngForm">
             <mat-card class="default">
                 <mat-card-content *ngIf="entity.patient">
@@ -54,7 +49,7 @@
                         </mat-form-field>
                     </div>
                     <div>
-                        <mat-form-field class="full-width" *ngIf="entity.id && !!eac2Min">
+                        <mat-form-field class="full-width" *ngIf="entity.dateEac1 && !!eac2Min">
                             <input matInput [matDatepicker]="picker2"
                                    placeholder="Date of 2nd EAC Session"
                                    [(ngModel)]="entity.dateEac2"
@@ -110,6 +105,43 @@
                                 Date of third EAC session cannot be after {{today | date: 'dd MMM, yyyy'}}
                             </mat-error>
                         </mat-form-field>
+                    </div>
+                    <div class="row" *ngIf="entity.dateEac3">
+                        <div class="col-md-6">
+                            <mat-checkbox [(ngModel)]="completed"
+                                          name="ec">
+                                EAC Completed?
+                            </mat-checkbox>
+                        </div>
+                        <div class="col-md-6">
+                            <mat-form-field class="full-width" *ngIf="completed">
+                                <input matInput [matDatepicker]="picker5"
+                                       placeholder="Date of completion of EAC sessions"
+                                       [(ngModel)]="dateCompleted"
+                                       #visit5="ngModel"
+                                       [max]="today"
+                                       [min]="completionMin"
+                                       name="visit5">
+                                <mat-datepicker-toggle
+                                        matSuffix
+                                        [for]="picker5">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker5></mat-datepicker>
+                                <mat-error
+                                        *ngIf="visit5.errors && (visit5.dirty || visit5.touched) && (visit5.errors.required)">
+                                    Date of completion of EAC sessions is required
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit5.errors && (visit5.dirty || visit5.touched) && (visit5.errors.min)">
+                                    Date of completion of EAC sessions cannot be
+                                    before {{entity.dateEac3 | date: 'dd MMM, yyyy'}}
+                                </mat-error>
+                                <mat-error
+                                        *ngIf="visit5.errors && (visit5.dirty || visit5.touched) && (visit5.errors.max)">
+                                    Date of completion of EAC sessions cannot be after {{today | date: 'dd MMM, yyyy'}}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
                     </div>
                     <div>
                         <mat-form-field class="full-width" *ngIf="entity.dateEac3 && !!repeatVLMin">

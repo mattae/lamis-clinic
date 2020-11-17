@@ -1,5 +1,5 @@
 {
-  "name": "lamis-clinic-1.4.0",
+  "name": "lamis-clinic-1.4.1",
   "version": "1.0.0",
   "main": "./bundles/lamis-clinic-1.0.0.umd.js",
   "module": "./fesm5/lamis-clinic.js",
@@ -40,7 +40,6 @@
     "@angular/router": "8.0.0",
     "@covalent/core": "^2.0.0",
     "@lamis/web-core": "git+https://gitlab.com/mattae/LamisWebCore",
-    "@qlack/angular-global-injector": "3.0.25",
     "@swimlane/ngx-datatable": "16.0.2",
     "rxjs": "6.5.2"
   },
@@ -79,7 +78,6 @@
     "@types/node": "^8.10.39",
     "angular-material-formio": "^1.0.1",
     "codelyzer": "~4.5.0",
-    "install-peers": "^1.0.3",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.1.1",

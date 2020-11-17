@@ -25,7 +25,7 @@
                                 </mat-error>
                                 <mat-error
                                         *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.min)">
-                                    Date of Screening cannot be before {{patient.dateBirth}}
+                                    Date of Screening cannot be before {{patient.dateBirth | date: 'dd MMM, yyyy'}}
                                 </mat-error>
                                 <mat-error
                                         *ngIf="visit.errors && (visit.dirty || visit.touched) && (visit.errors.max)">
@@ -116,7 +116,7 @@
                                 </mat-error>
                                 <mat-error
                                         *ngIf="treat.errors && (treat.dirty || treat.touched) && (treat.errors.min)">
-                                    Date Treated cannot be before {{entity.dateScreened}}
+                                    Date Treated cannot be before {{entity.dateScreened | date: 'dd MMM, yyyy'}}
                                 </mat-error>
                                 <mat-error
                                         *ngIf="treat.errors && (treat.dirty || treat.touched) && (treat.errors.max)">
@@ -149,7 +149,7 @@
                     <button mat-raised-button color='primary'
                             [disabled]="screeningForm.invalid || isSaving"
                             type="submit">
-                        {{!!observation ? 'Update' : 'Save'}}
+                        {{!!observation.date ? 'Update' : 'Save'}}
                     </button>
                 </mat-card-actions>
             </mat-card>

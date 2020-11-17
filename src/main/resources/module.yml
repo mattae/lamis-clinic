@@ -1,8 +1,8 @@
 basePackage: org.fhi360.lamis.modules.clinic
 name: LAMISClinicModule
-dependencies: {LAMISPatientModule: 1.0.0}
+dependencies: {LAMISPatientModule: 1.4.0}
 store: true
-umdLocation: /across/resources/static/clinic/js/bundles/lamis-clinic-1.4.0.umd.js
+umdLocation: /across/resources/static/clinic/js/bundles/lamis-clinic-1.4.1.umd.js
 webModules:
   - breadcrumb: CLINIC
     name: ClinicModule
@@ -25,6 +25,8 @@ webModules:
     path: admin/case-managers
     position: 100
     name: CaseManagerModule
+  - path: covid19-screenings
+    name: Covid19Module
 menus:
   - icon: assignment_ind
     disabled: false

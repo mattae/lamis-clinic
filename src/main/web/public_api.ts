@@ -12,3 +12,4 @@ export * from './lib/eac.module';
 export * from './lib/case-management.module';
 export * from './lib/case-manager.module';
 export * from './lib/cervical-cancer.module';
+export * from './lib/covid19.module';

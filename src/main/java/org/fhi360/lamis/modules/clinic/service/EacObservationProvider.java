@@ -1,5 +1,7 @@
 package org.fhi360.lamis.modules.clinic.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.NullNode;
 import lombok.RequiredArgsConstructor;
 import org.fhi360.lamis.modules.patient.service.providers.PatientObservationViewProvider;
 import org.lamisplus.modules.lamis.legacy.domain.entities.Eac;
@@ -48,8 +50,10 @@ public class EacObservationProvider implements PatientObservationViewProvider {
                 .sorted((e1, e2) -> e2.getDateEac1().compareTo(e1.getDateEac1()))
                 .limit(1)
                 .findFirst();
+        JsonNode extra = patient.getExtra();
+        boolean art = (extra.get("art") != null || !(extra.get("art") instanceof NullNode)) && extra.get("art").asBoolean();
         return (eacs.isEmpty() || (latestEac.isPresent() && latestEac.get().getDateSampleCollected() != null))
-                && above1000[0] && !Objects.equals(patient.getStatusAtRegistration(), ClientStatus.HIV_NEGATIVE);
+                && above1000[0] && art;
     }
 
     @Override

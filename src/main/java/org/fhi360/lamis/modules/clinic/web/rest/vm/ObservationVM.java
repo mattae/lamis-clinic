@@ -7,8 +7,9 @@ import org.lamisplus.modules.lamis.legacy.domain.entities.Patient;
 import java.time.LocalDate;
 
 @Data
-public class ScreeningVM {
+public class ObservationVM {
     private Patient patient;
     private LocalDate date;
     private JsonNode data;
+    private String id;
 }
