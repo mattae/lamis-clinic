@@ -488,7 +488,7 @@
                     </div>
                     <div>
                         <mat-form-field class="full-width">
-                            <mat-select [(ngModel)]="oiList"
+                            <mat-select [(ngModel)]="entity.opportunisticInfections"
                                         placeholder="Opportunistic Infections"
                                         [compareWith]="entityCompare"
                                         name="ois"
@@ -547,7 +547,7 @@
                         <div class="col-md-6">
                             <mat-form-field class="full-width"
                                             *ngIf="entity.adherenceLevel === 'Fair' || entity.adherenceLevel === 'Poor'">
-                                <mat-select [(ngModel)]="adhereList"
+                                <mat-select [(ngModel)]="entity.adheres"
                                             placeholder="Adherence"
                                             name="ads"
                                             [compareWith]="entityCompare"

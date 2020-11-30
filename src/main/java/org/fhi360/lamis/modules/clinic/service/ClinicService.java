@@ -11,6 +11,7 @@ import org.lamisplus.modules.lamis.legacy.domain.repositories.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 @Service
@@ -24,6 +25,7 @@ public class ClinicService {
     private final JdbcTemplate jdbcTemplate;
 
     public Clinic saveClinic(Clinic clinic) {
+        //clinic.setOpportunisticInfections(new HashSet<>());
         if (clinic.getCommence() != null && clinic.getCommence()) {
             patientRepository.findById(clinic.getPatient().getId()).ifPresent(patient -> {
                 JsonNode extra = patient.getExtra();

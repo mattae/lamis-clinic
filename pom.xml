@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.fhi360.lamis.modules</groupId>
     <artifactId>clinic</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.4</version>
     <name>LAMIS Clinic Module</name>
 
     <properties>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>org.lamisplus.modules</groupId>
             <artifactId>lamis-legacy</artifactId>
-            <version>1.3.1</version>
+            <version>1.3.3</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

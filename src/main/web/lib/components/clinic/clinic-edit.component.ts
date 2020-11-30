@@ -1,12 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {
-    Adhere,
-    AdverseDrugReaction,
-    Clinic,
-    ClinicAdverseDrugReaction,
-    ClinicVm,
-    OpportunisticInfection
-} from '../../model/clinic.model';
+import {Adhere, AdverseDrugReaction, Clinic, ClinicAdverseDrugReaction, OpportunisticInfection} from '../../model/clinic.model';
 import {ClinicService} from '../../services/clinic.service';
 import {NotificationService} from '@alfresco/adf-core';
 import {ActivatedRoute} from '@angular/router';
@@ -43,8 +36,8 @@ export class ClinicEditComponent implements OnInit {
     dateRegistration: Moment;
     visitDates: Moment[] = [];
     selectedClinicAdr: ClinicAdverseDrugReaction[] = [];
-    oiList: OpportunisticInfection[] = [];
-    adhereList: Adhere[] = [];
+    // oiList: OpportunisticInfection[] = [];
+    // adhereList: Adhere[] = [];
     ColumnMode = ColumnMode;
     adr = false;
     enrolledOnOTZ: boolean;
@@ -143,7 +136,7 @@ export class ClinicEditComponent implements OnInit {
                 this.clinicService.adverseDrugReactions().subscribe(res1 => {
                     this.adverseDrugReactions = res1;
 
-                    this.adr = !!this.entity.adverseDrugReactions;
+                    this.adr = !!this.entity.adverseDrugReactions.length;
                     this.adverseDrugReactions.forEach(adr => {
                         let found = false;
                         (this.entity.adverseDrugReactions || []).forEach(cadr => {
@@ -273,8 +266,12 @@ export class ClinicEditComponent implements OnInit {
             this.entity.extra.prep.urinalysis = this.urinalysis;
         }
         this.entity.adverseDrugReactions = this.selectedClinicAdr.filter(cadr => !!cadr.severity);
-        this.entity.opportunisticInfections = this.oiList;
-        this.entity.adheres = this.adhereList;
+        if (this.entity.opportunisticInfections && this.entity.opportunisticInfections.length &&
+            !this.entity.opportunisticInfections[1]) {
+            this.entity.opportunisticInfections = [];
+        }
+        // this.entity.opportunisticInfections = this.oiList;
+        // this.entity.adheres = this.adhereList;
         this.appLoaderService.open('Saving clinic visit..');
         if (this.entity.id !== undefined) {
             this.subscribeToSaveResponse(this.clinicService.update(this.entity));

@@ -2,7 +2,7 @@ basePackage: org.fhi360.lamis.modules.clinic
 name: LAMISClinicModule
 dependencies: {LAMISPatientModule: 1.4.0}
 store: true
-umdLocation: /across/resources/static/clinic/js/bundles/lamis-clinic-1.4.1.umd.js
+umdLocation: /across/resources/static/clinic/js/bundles/lamis-clinic-1.4.4.umd.js
 webModules:
   - breadcrumb: CLINIC
     name: ClinicModule

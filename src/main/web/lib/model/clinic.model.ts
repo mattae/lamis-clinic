@@ -85,8 +85,6 @@ export interface Clinic {
 
 export interface ClinicVm {
     clinic?: Clinic;
-    adhereList?: Adhere[];
-    adrList?: ClinicAdverseDrugReaction[];
     oiList?: OpportunisticInfection[];
 }
 
