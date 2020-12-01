@@ -454,6 +454,7 @@
                         <mat-form-field class="full-width">
                             <mat-select [(ngModel)]="entity.pregnancyStatus"
                                         placeholder="Pregnancy Status"
+                                        [required]="pregnancyReportingRequired"
                                         #pregStatus="ngModel" name="ps">
                                 <mat-option>None</mat-option>
                                 <mat-option [value]="1">Not Pregnant</mat-option>

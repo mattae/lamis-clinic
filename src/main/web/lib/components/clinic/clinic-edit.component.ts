@@ -57,6 +57,7 @@ export class ClinicEditComponent implements OnInit {
     hepatitisB: string;
     hepatitisC: string;
     creatinineClearance: any;
+    pregnancyReportingRequired = false;
 
     constructor(private clinicService: ClinicService,
                 protected notification: NotificationService,
@@ -113,6 +114,9 @@ export class ClinicEditComponent implements OnInit {
 
                 this.otzApplicable = !moment().subtract(24, 'years').isAfter(this.entity.patient.dateBirth)
                     && !moment().subtract(10, 'years').isBefore(this.entity.patient.dateBirth);
+
+                this.pregnancyReportingRequired = !moment().subtract(49, 'years').isAfter(this.entity.patient.dateBirth)
+                    && !moment().subtract(15, 'years').isBefore(this.entity.patient.dateBirth);
 
                 this.clinicService.getVisitDatesByPatient(this.entity.patient.id).subscribe((res1) => {
                     this.visitDates = res1;

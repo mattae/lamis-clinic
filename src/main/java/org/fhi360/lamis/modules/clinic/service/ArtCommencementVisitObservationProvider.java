@@ -19,7 +19,8 @@ public class ArtCommencementVisitObservationProvider implements PatientObservati
     @Override
     public boolean applicableTo(Patient patient) {
         JsonNode extra = patient.getExtra();
-        return !clinicRepository.getArtCommencement(patient).isPresent() && extra.get("art").asBoolean();
+        return !clinicRepository.getArtCommencement(patient).isPresent()
+                && (extra.get("art") != null && !(extra.get("art") instanceof NullNode)) && extra.get("art").asBoolean();
     }
 
     @Override

@@ -51,7 +51,7 @@ public class EacObservationProvider implements PatientObservationViewProvider {
                 .limit(1)
                 .findFirst();
         JsonNode extra = patient.getExtra();
-        boolean art = (extra.get("art") != null || !(extra.get("art") instanceof NullNode)) && extra.get("art").asBoolean();
+        boolean art = (extra.get("art") != null && !(extra.get("art") instanceof NullNode)) && extra.get("art").asBoolean();
         return (eacs.isEmpty() || (latestEac.isPresent() && latestEac.get().getDateSampleCollected() != null))
                 && above1000[0] && art;
     }

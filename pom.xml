@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.fhi360.lamis.modules</groupId>
     <artifactId>clinic</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.5</version>
     <name>LAMIS Clinic Module</name>
 
     <properties>
